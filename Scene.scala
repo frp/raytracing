@@ -39,7 +39,11 @@ class Scene(width: Int, height: Int, fovX: Double) {
     val normal = (intersection_point - sphere.centre).normalize
     val intensityUnscaled = lights.foldLeft(Vector3(0,0,0)) { (sum, light) =>
       val lightsource_dir = (light.origin - intersection_point).normalize
-      sum + (light.color * (lightsource_dir * normal)).replaceNegativesBy0
+      val (_, obstacle) = traceRay(new Ray(intersection_point + lightsource_dir * 0.01, lightsource_dir))
+      if (obstacle == null)
+        sum + (light.color * (lightsource_dir * normal)).replaceNegativesBy0
+      else
+        sum
     }
 
     val intensity = (intensityUnscaled + ambientLight).intensityScale

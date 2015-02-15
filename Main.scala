@@ -3,13 +3,27 @@ import javax.imageio.ImageIO
 import java.awt.image.BufferedImage
 import scala.math._
 import MathTools._
+import GraphicsTools._
 
 object Main {
   def squareDemo {
+    val v1 = Vector3(-2, -2, 3)
+    val v2 = Vector3(-2, 2, 3)
+    val v3 = Vector3(2, -2, 3)
+    val v4 = Vector3(2, 2, 3)
+
+    val t1 = Vector2(0, 0)
+    val t2 = Vector2(0, 1)
+    val t3 = Vector2(1, 0)
+    val t4 = Vector2(1, 1)
+
+    val tex = readTexture("tex.jpg")
+    val mat = Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0, tex)
+
     render(
       List(
-        Triangle(Vector3(-2, -2, 3), Vector3(-2, 2, 3), Vector3(2, -2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0)),
-        Triangle(Vector3(2, -2, 3), Vector3(-2, 2, 3), Vector3(2, 2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0))
+        Triangle(v1, v2, v3, t1, t2, t3, mat),
+        Triangle(v3, v2, v4, t3, t2, t4, mat)
       ),
       List(Light(Vector3(0, 0, 0), intToColor(0xffffff))),
       Vector3(0, 0, 0))
@@ -27,13 +41,26 @@ object Main {
   }
 
   def maxDemo {
+    val v1 = Vector3(-10, -2, 0)
+    val v2 = Vector3(-10, -2, 10)
+    val v3 = Vector3(10, -2, 0)
+    val v4 = Vector3(10, -2, 10)
+
+    val t1 = Vector2(0, 0)
+    val t2 = Vector2(0, 3)
+    val t3 = Vector2(3, 0)
+    val t4 = Vector2(3, 3)
+
+    val tex = readTexture("tex.jpg")
+    val mat = Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0.3, tex)
+
     render(
       List(
-        Triangle(Vector3(-10, -2, 0), Vector3(-10, -2, 10), Vector3(10, -2, 0), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
-        Triangle(Vector3(10, -2, 10), Vector3(10, -2, 0), Vector3(-10, -2, 10), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
-        Sphere(0, 0, 10, 3, 0xff88ff, 0xffffff, 100, 0.5),
-        Sphere(-1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3),
-        Sphere(1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3)
+        Triangle(v1, v2, v3, t1, t2, t3, mat),
+        Triangle(v4, v3, v2, t4, t3, t2, mat),
+        Sphere(0, 0, 10, 3, 0xff88ff, 0xffffff, 100, 0.7),
+        Sphere(-1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.5),
+        Sphere(1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.5)
       ),
       List(Light(Vector3(-5, 1, 0), intToColor(0xffffff))),
       Vector3(0.3, 0.3, 0.3)

@@ -45,7 +45,7 @@ class Scene(width: Int, height: Int, fovX: Double, depthLimit: Int) {
     */
   def applyShading(ray: Ray, distance: Double, localCoords: Vector2, shape: Shape, depth: Int): Vector3 = {
     val intersection_point = ray.direction * distance + ray.origin
-    val normal = shape.normal(localCoords)
+    val normal = shape.normal(intersection_point)
 
     // calculate the sum for all lights
     // initial value is ambient light (the background light that is present without light sources)
@@ -95,7 +95,7 @@ class Scene(width: Int, height: Int, fovX: Double, depthLimit: Int) {
         renderRay(new Ray(intersection_point + reflectedDir * 0.05, reflectedDir), depth - 1)
       }
 
-    reflection * shape.material.reflection + light * (1 - shape.material.reflection)
+    reflection * shape.material.reflection + (light * (1 - shape.material.reflection)).perComponentMul(shape.texture(intersection_point))
   }
 
   /** cast a ray, get color vector */

@@ -21,7 +21,7 @@ case class Sphere(centre: Vector3, radius: Double, material: Material) extends S
       None
   }
 
-  def normal(c: Vector2) = Vector3(sin(c.x) * cos(c.y), sin(c.x) * sin(c.y), cos(c.x))
+  def normal(c: Vector3) = (c - centre).normalize
 }
 
 object Sphere {

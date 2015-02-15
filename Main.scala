@@ -51,16 +51,18 @@ object Main {
     val t3 = Vector2(3, 0)
     val t4 = Vector2(3, 3)
 
-    val tex = readTexture("tex.jpg")
-    val mat = Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0.3, tex)
+    val tex1 = readTexture("tex.jpg")
+    val tex2 = readTexture("earth.jpg")
+    val mat1 = Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0.3, tex1)
+    val mat2 = Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0.3, tex2)
 
     render(
       List(
-        Triangle(v1, v2, v3, t1, t2, t3, mat),
-        Triangle(v4, v3, v2, t4, t3, t2, mat),
+        Triangle(v1, v2, v3, t1, t2, t3, mat1),
+        Triangle(v4, v3, v2, t4, t3, t2, mat1),
         Sphere(0, 0, 10, 3, 0xff88ff, 0xffffff, 100, 0.7),
         Sphere(-1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.5),
-        Sphere(1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.5)
+        Sphere(1, -1, 5, 1, mat2)
       ),
       List(Light(Vector3(-5, 1, 0), intToColor(0xffffff))),
       Vector3(0.3, 0.3, 0.3)

@@ -13,6 +13,8 @@ case class Vector3(x: Double, y: Double, z: Double) {
 
   def cross(v: Vector3) = Vector3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x)
 
+  def toSpherical = Vector3(length, acos(z / length), atan2(y, x))
+
   def perComponentMul(b: Vector3) =
     Vector3(x * b.x, y * b.y, z * b.z)
 

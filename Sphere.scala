@@ -21,7 +21,18 @@ case class Sphere(centre: Vector3, radius: Double, material: Material) extends S
       None
   }
 
-  def normal(c: Vector3) = (c - centre).normalize
+  override def normal(c: Vector3) = (c - centre).normalize
+
+  override def texture(c: Vector3) = {
+    if (material.texture != null) {
+      val dir = c - centre
+      val Vector3(_, t, p) = Vector3(dir.x, dir.z, dir.y).toSpherical
+      val tc = Vector2((p + Pi) / (2 * Pi), t / Pi)
+      material.textureColor(tc)
+    }
+    else
+      Vector3(1, 1, 1)
+  }
 }
 
 object Sphere {
@@ -29,4 +40,6 @@ object Sphere {
     Sphere(Vector3(x,y,z), r, Material(intToColor(color), intToColor(specular), shininess, 0))
   def apply(x: Double, y: Double, z: Double, r: Double, color: Int, specular: Int, shininess: Double, reflection: Double):Sphere =
     Sphere(Vector3(x,y,z), r, Material(intToColor(color), intToColor(specular), shininess, reflection))
+  def apply(x: Double, y: Double, z: Double, r: Double, mat: Material):Sphere =
+    Sphere(Vector3(x,y,z), r, mat)
 }

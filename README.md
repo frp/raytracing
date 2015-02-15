@@ -6,5 +6,5 @@ Renders triangles (non-smooth, no ability to interpolate normales) and spheres, 
 
 * Install sbt
 * Clone the repository
-* Call `sbt run` for sphere demo
-* Call `sbt run square` for square (formed from triangles) demo
+* Call `sbt run` for demo
+* `sbt run square` and `sbt run sphere` for alternative demos

@@ -2,14 +2,10 @@ import scala.math._
 import MathTools._
 
 class Scene(width: Int, height: Int, fovX: Double) {
-  var spheres = List[Sphere]()
+  var shapes = List[Shape]()
 
-  def addSphere(s: Sphere) {
-    spheres = s :: spheres
-  }
-
-  def addSphere(x: Double, y: Double, z: Double, r: Double, c: Int, s: Int, sh: Double) {
-    spheres = Sphere(Vector3(x, y, z), r, Material(intToColor(c), intToColor(s), sh)) :: spheres
+  def addShape(s: Shape) {
+    shapes = s :: shapes
   }
 
   var lights = List[Light]()
@@ -29,37 +25,38 @@ class Scene(width: Int, height: Int, fovX: Double) {
   /** Trace ray, find the first object it intersects
     *
     * @param ray the ray to trace
-    * @return tuple that consists of the distance to the intersected object and the object (sphere) itself
+    * @return tuple that consists of the distance to the intersected object and the object itself
     */
-  def traceRay(ray: Ray) = spheres.foldLeft((-1.0, null: Sphere)) { (result, sphere) =>
-    val (distance, orig_sphere) = result
-    sphere.intersect(ray) match {
-      case Some(d) => if (distance == -1 || d < distance) (d, sphere) else (distance, orig_sphere)
-      case None => (distance, orig_sphere)
+  def traceRay(ray: Ray) = shapes.foldLeft((-1.0, null: Shape, Vector2(0, 0))) { (result, shape) =>
+    val (distance, orig_shape, orig_coords) = result
+    shape.intersect(ray) match {
+      case Some((d, coords)) => if (d > 0 && (distance == -1 || d < distance)) (d, shape, coords) else (distance, orig_shape, orig_coords)
+      case None => (distance, orig_shape, orig_coords)
     }
   }
 
-  /** Given the viewer ray, distance, object (sphere), calculate the color
+  /** Given the viewer ray, distance, object, calculate the color
     *
     * @param ray the ray from the camera to the intersection point
     * @param distance the distance from the camera to the intersection point
-    * @param sphere the intersected sphere
+    * @param localCoords the local coordinates of intersection point (meaning is different for different objects)
+    * @param shape the intersected object
     * @return the color
     */
-  def applyShading(ray: Ray, distance: Double, sphere: Sphere) = {
+  def applyShading(ray: Ray, distance: Double, localCoords: Vector2, shape: Shape) = {
     val intersection_point = ray.direction * distance + ray.origin
-    val normal = (intersection_point - sphere.centre).normalize
+    val normal = shape.normal(localCoords)
 
     // calculate the sum for all lights
     // initial value is ambient light (the background light that is present without light sources)
-    lights.foldLeft(sphere.material.ambient.perComponentMul(ambientLight)) { (sum, light) =>
+    lights.foldLeft(shape.material.ambient.perComponentMul(ambientLight)) { (sum, light) =>
       // direction from the intersection point to the light source
       val lightsource_dir = (light.origin - intersection_point).normalize
 
       // find the obstacle on the path from the intersection point to the light source
       // if there is an obstacle, the object is in the shadow, not illuminated by this light source
       // adding 0.01 is needed to avoid having intersections with itself
-      val (_, obstacle) = traceRay(new Ray(intersection_point + lightsource_dir * 0.01, lightsource_dir))
+      val (_, obstacle, _) = traceRay(new Ray(intersection_point + lightsource_dir * 0.05, lightsource_dir))
 
       // if no obstacle, we're not in shadow
       if (obstacle == null) {
@@ -77,12 +74,12 @@ class Scene(width: Int, height: Int, fovX: Double) {
         // we apply specular light only if both specular and diffuse light values are positive
         val specular =
           if (specularDotProduct > 0 && diffuseDotProduct > 0)
-            (light.color * (viewer_dir * r)).powComponents(sphere.material.shininess)
+            (light.color * (viewer_dir * r)).powComponents(shape.material.shininess)
           else
             Vector3(0, 0, 0)
 
         // add the diffuse and specular light to the resulting light
-        sum + diffuse.perComponentMul(sphere.material.diffuse) + specular.perComponentMul(sphere.material.specular)
+        sum + diffuse.perComponentMul(shape.material.diffuse) + specular.perComponentMul(shape.material.specular)
       }
       else
         sum
@@ -97,11 +94,11 @@ class Scene(width: Int, height: Int, fovX: Double) {
     // In most of 3D renderers, camera always stays in the same place, the world is moved and rotated instead
     val ray = new Ray(Vector3(0, 0, 0), Vector3(x - width/2, height/2 - y, renderPlane))
 
-    val (distance, sphere) = traceRay(ray)
-    if (sphere == null)
+    val (distance, shape, coords) = traceRay(ray)
+    if (shape == null)
       0
     else
-      colorToInt(applyShading(ray, distance, sphere))
+      colorToInt(applyShading(ray, distance, coords, shape))
   }
 
   /** Render all pixels and pass their colors to callback

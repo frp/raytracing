@@ -13,12 +13,7 @@ case class Vector3(x: Double, y: Double, z: Double) {
   def perComponentMul(b: Vector3) =
     Vector3(x * b.x, y * b.y, z * b.z)
 
-  def replaceNegativesBy0 = Vector3(max(x, 0), max(y, 0), max(z, 0))
-
-  def intensityScale = {
-    val maxc = max(x,max(y,z))
-    if (maxc > 1) this / maxc else this
-  }
+  def cutValuesAbove(t: Double) = Vector3(min(x, t), min(y, t), min(z, t))
 
   def powComponents(p: Double) = Vector3(pow(x, p), pow(y, p), pow(z, p))
 }

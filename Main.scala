@@ -8,8 +8,8 @@ object Main {
   def squareDemo {
     render(
       List(
-        Triangle(Vector3(-2, -2, 3), Vector3(-2, 2, 3), Vector3(2, -2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100)),
-        Triangle(Vector3(2, -2, 3), Vector3(-2, 2, 3), Vector3(2, 2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100))
+        Triangle(Vector3(-2, -2, 3), Vector3(-2, 2, 3), Vector3(2, -2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0)),
+        Triangle(Vector3(2, -2, 3), Vector3(-2, 2, 3), Vector3(2, 2, 3), Material(intToColor(0xcccccc), intToColor(0xffffff), 100, 0))
       ),
       List(Light(Vector3(0, 0, 0), intToColor(0xffffff))),
       Vector3(0, 0, 0))
@@ -29,9 +29,10 @@ object Main {
   def maxDemo {
     render(
       List(
-        Triangle(Vector3(-10, -2, 0), Vector3(-10, -2, 10), Vector3(10, -2, 0), Material(intToColor(0xcccccc), intToColor(0xffffff), 100)),
-        Triangle(Vector3(10, -2, 10), Vector3(10, -2, 0), Vector3(-10, -2, 10), Material(intToColor(0xcccccc), intToColor(0xffffff), 100)),
-        Sphere(0, -1, 3, 1, 0xffffff, 0xffffff, 100)
+        Triangle(Vector3(-10, -2, 0), Vector3(-10, -2, 10), Vector3(10, -2, 0), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
+        Triangle(Vector3(10, -2, 10), Vector3(10, -2, 0), Vector3(-10, -2, 10), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
+        Sphere(-1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3),
+        Sphere(1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3)
       ),
       List(Light(Vector3(-5, 1, 0), intToColor(0xffffff))),
       Vector3(0.3, 0.3, 0.3)
@@ -39,7 +40,7 @@ object Main {
   }
 
   def render(shapes: List[Shape], lights: List[Light], ambient: Vector3) {
-    val scene = new Scene(1920, 1080, 2 * Pi / 3)
+    val scene = new Scene(1920, 1080, Pi / 2)
 
     scene.shapes = shapes
     scene.lights = lights

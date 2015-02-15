@@ -43,13 +43,13 @@ class Scene(width: Int, height: Int, fovX: Double) {
     * @param shape the intersected object
     * @return the color
     */
-  def applyShading(ray: Ray, distance: Double, localCoords: Vector2, shape: Shape) = {
+  def applyShading(ray: Ray, distance: Double, localCoords: Vector2, shape: Shape, depth: Int): Vector3 = {
     val intersection_point = ray.direction * distance + ray.origin
     val normal = shape.normal(localCoords)
 
     // calculate the sum for all lights
     // initial value is ambient light (the background light that is present without light sources)
-    lights.foldLeft(shape.material.ambient.perComponentMul(ambientLight)) { (sum, light) =>
+    val light = lights.foldLeft(shape.material.ambient.perComponentMul(ambientLight)) { (sum, light) =>
       // direction from the intersection point to the light source
       val lightsource_dir = (light.origin - intersection_point).normalize
 
@@ -84,7 +84,31 @@ class Scene(width: Int, height: Int, fovX: Double) {
       else
         sum
     }
+
+    // Apply reflection by casting a reflected ray and applying render recursively
+    // Since it can be infinite process, limit recursion depth
+    val reflection =
+      if (depth == 0)
+        Vector3(0, 0, 0)
+      else {
+        val reflectedDir = normal * 2 * (-ray.direction * normal) + ray.direction
+        renderRay(new Ray(intersection_point + reflectedDir * 0.05, reflectedDir), depth - 1)
+      }
+
+    reflection * shape.material.reflection + light * (1 - shape.material.reflection)
   }
+
+  /** cast a ray, get color vector */
+  def renderRay(ray: Ray, depth: Int) = {
+    val (distance, shape, coords) = traceRay(ray)
+
+    if (shape == null)
+      Vector3(0, 0, 0)
+    else
+      applyShading(ray, distance, coords, shape, depth)
+  }
+
+  val depthLimit = 5
 
   /** renders one pixel of the image */
   def renderPixel(x: Int, y: Int) = {
@@ -93,12 +117,7 @@ class Scene(width: Int, height: Int, fovX: Double) {
     // Other configurations would make algorithm much more complex
     // In most of 3D renderers, camera always stays in the same place, the world is moved and rotated instead
     val ray = new Ray(Vector3(0, 0, 0), Vector3(x - width/2, height/2 - y, renderPlane))
-
-    val (distance, shape, coords) = traceRay(ray)
-    if (shape == null)
-      0
-    else
-      colorToInt(applyShading(ray, distance, coords, shape))
+    colorToInt(renderRay(ray, depthLimit))
   }
 
   /** Render all pixels and pass their colors to callback

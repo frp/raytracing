@@ -26,5 +26,7 @@ case class Sphere(centre: Vector3, radius: Double, material: Material) extends S
 
 object Sphere {
   def apply(x: Double, y: Double, z: Double, r: Double, color: Int, specular: Int, shininess: Double):Sphere =
-    Sphere(Vector3(x,y,z), r, Material(intToColor(color), intToColor(specular), shininess))
+    Sphere(Vector3(x,y,z), r, Material(intToColor(color), intToColor(specular), shininess, 0))
+  def apply(x: Double, y: Double, z: Double, r: Double, color: Int, specular: Int, shininess: Double, reflection: Double):Sphere =
+    Sphere(Vector3(x,y,z), r, Material(intToColor(color), intToColor(specular), shininess, reflection))
 }

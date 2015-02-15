@@ -31,6 +31,7 @@ object Main {
       List(
         Triangle(Vector3(-10, -2, 0), Vector3(-10, -2, 10), Vector3(10, -2, 0), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
         Triangle(Vector3(10, -2, 10), Vector3(10, -2, 0), Vector3(-10, -2, 10), Material(intToColor(0xcccc00), intToColor(0xffff00), 100, 0.3)),
+        Sphere(0, 0, 10, 3, 0xff88ff, 0xffffff, 100, 0.5),
         Sphere(-1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3),
         Sphere(1, -1, 5, 1, 0xffffff, 0xffffff, 100, 0.3)
       ),
@@ -40,7 +41,7 @@ object Main {
   }
 
   def render(shapes: List[Shape], lights: List[Light], ambient: Vector3) {
-    val scene = new Scene(1920, 1080, Pi / 2)
+    val scene = new Scene(1920, 1080, Pi / 2, 5)
 
     scene.shapes = shapes
     scene.lights = lights

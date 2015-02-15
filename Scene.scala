@@ -1,7 +1,7 @@
 import scala.math._
 import MathTools._
 
-class Scene(width: Int, height: Int, fovX: Double) {
+class Scene(width: Int, height: Int, fovX: Double, depthLimit: Int) {
   var shapes = List[Shape]()
 
   def addShape(s: Shape) {
@@ -107,8 +107,6 @@ class Scene(width: Int, height: Int, fovX: Double) {
     else
       applyShading(ray, distance, coords, shape, depth)
   }
-
-  val depthLimit = 5
 
   /** renders one pixel of the image */
   def renderPixel(x: Int, y: Int) = {

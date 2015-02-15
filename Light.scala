@@ -1,1 +1,1 @@
-case class Light(origin: Vector3, intensity: Double)
+case class Light(origin: Vector3, color: Vector3)

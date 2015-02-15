@@ -1,6 +1,6 @@
 import scala.math._
 
-case class Sphere(centre: Vector3, radius: Double, color: Int) {
+case class Sphere(centre: Vector3, radius: Double, color: Vector3) {
   def intersect(r: Ray) = {
     val d_base = -(r.direction * (r.origin - centre))
     val discriminant = pow(r.direction * (r.origin - centre), 2) - (r.origin - centre).sqr + radius * radius

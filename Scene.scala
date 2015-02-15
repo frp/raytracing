@@ -9,7 +9,7 @@ class Scene(width: Int, height: Int, fovX: Double) {
   }
 
   def addSphere(x: Double, y: Double, z: Double, r: Double, c: Int) {
-    spheres = Sphere(Vector3(x, y, z), r, c) :: spheres
+    spheres = Sphere(Vector3(x, y, z), r, intToColor(c)) :: spheres
   }
 
   var lights = List[Light]()
@@ -18,11 +18,13 @@ class Scene(width: Int, height: Int, fovX: Double) {
     lights = l :: lights
   }
 
-  def addLight(x: Double, y: Double, z: Double, i: Double) {
-    lights = Light(Vector3(x,y,z), i) :: lights
+  def addLight(x: Double, y: Double, z: Double, c: Int) {
+    lights = Light(Vector3(x,y,z), intToColor(c)) :: lights
   }
 
   val renderPlane = width / (2 * tan(fovX / 2))
+
+  var ambientLight = Vector3(0, 0, 0)
 
   def traceRay(ray: Ray) = spheres.foldLeft((-1.0, null: Sphere)) { (result, sphere) =>
     val (distance, orig_sphere) = result
@@ -35,12 +37,14 @@ class Scene(width: Int, height: Int, fovX: Double) {
   def applyShading(ray: Ray, distance: Double, sphere: Sphere) = {
     val intersection_point = ray.direction * distance + ray.origin
     val normal = (intersection_point - sphere.centre).normalize
-    val intensity = lights.foldLeft(0.0) { (sum, light) =>
+    val intensityUnscaled = lights.foldLeft(Vector3(0,0,0)) { (sum, light) =>
       val lightsource_dir = (light.origin - intersection_point).normalize
-      sum + lightsource_dir * normal * light.intensity
+      sum + (light.color * (lightsource_dir * normal)).replaceNegativesBy0
     }
 
-    applyIntensityToColor(sphere.color, intensity)
+    val intensity = (intensityUnscaled + ambientLight).intensityScale
+
+    intensity.perComponentMul(sphere.color)
   }
 
   def renderPixel(x: Int, y: Int) = {
@@ -50,7 +54,7 @@ class Scene(width: Int, height: Int, fovX: Double) {
     if (sphere == null)
       0
     else
-      applyShading(ray, distance, sphere)
+      colorToInt(applyShading(ray, distance, sphere))
   }
 
   def render(callback: (Int, Int, Int) => Unit) =

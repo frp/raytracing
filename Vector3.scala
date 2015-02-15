@@ -19,4 +19,6 @@ case class Vector3(x: Double, y: Double, z: Double) {
     val maxc = max(x,max(y,z))
     if (maxc > 1) this / maxc else this
   }
+
+  def powComponents(p: Double) = Vector3(pow(x, p), pow(y, p), pow(z, p))
 }

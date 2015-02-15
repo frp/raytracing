@@ -40,8 +40,13 @@ class Scene(width: Int, height: Int, fovX: Double) {
     val intensityUnscaled = lights.foldLeft(Vector3(0,0,0)) { (sum, light) =>
       val lightsource_dir = (light.origin - intersection_point).normalize
       val (_, obstacle) = traceRay(new Ray(intersection_point + lightsource_dir * 0.01, lightsource_dir))
-      if (obstacle == null)
-        sum + (light.color * (lightsource_dir * normal)).replaceNegativesBy0
+      if (obstacle == null) {
+        val diffuse = (light.color * (lightsource_dir * normal)).replaceNegativesBy0
+        val r = normal * 2 * (lightsource_dir * normal)  - lightsource_dir
+        val viewer_dir = ray.direction * (-1)
+        val specular = (light.color * (viewer_dir * r)).powComponents(2)
+        sum + diffuse + specular
+      }
       else
         sum
     }
